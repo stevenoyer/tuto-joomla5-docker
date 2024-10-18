@@ -1,0 +1,43 @@
+version: '3.1'
+
+services:
+  joomla:
+    image: joomla:5.2.0-php8.3-apache
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www/html
+    environment:
+      JOOMLA_DB_HOST: database
+      JOOMLA_DB_PASSWORD: mypassword
+    networks:
+      - joomla
+
+  database:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+    networks:
+      - joomla
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: database
+      UPLOAD_LIMIT: 300M
+    depends_on:
+      - database
+    networks:
+      - joomla
+
+networks:
+  joomla:
